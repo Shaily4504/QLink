@@ -14,7 +14,7 @@ export const Login = () => {
 
   useEffect(() => {
     const loadModels = async () => {
-      const PUBLIC_URL = "http://localhost:5200"
+      // const PUBLIC_URL = "http://localhost:5200"
       const MODEL_URL = "/models";
 
       await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);

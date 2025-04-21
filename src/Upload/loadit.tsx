@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import '@coreui/coreui-pro/dist/css/coreui.min.css';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import axios from 'axios';
 
@@ -12,7 +12,7 @@ type OptionType = {
 };
 
 export const Loadit = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
