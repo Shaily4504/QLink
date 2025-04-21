@@ -4,6 +4,7 @@ import cors from 'cors';
 import dbmschema from './schema.js';
 import assinmodel from './assinschema.js';
 import multer from 'multer'
+import QRCode from 'qrcode';
 
 const app = express();
 const port = 5200;
@@ -73,6 +74,8 @@ app.post("/upload-files", upload.single("file"), async (req, res) => {
       return res.status(400).json({ message: 'Missing file or receiver name' });
     }
 
+    const fileUrl = `http://localhost:5200/files/${file.filename}`; // Public URL
+
     const newDoc = new assinmodel({
       name: receiver, // ⬅️ Save it to the `name` field in schema
       fileName: file.originalname,
@@ -83,6 +86,8 @@ app.post("/upload-files", upload.single("file"), async (req, res) => {
     });
 
     await newDoc.save();
+    const qrDataUrl = await QRCode.toDataURL(fileUrl);
+    console.log(qrDataUrl);
 
     res.json({
       success: true,
@@ -90,6 +95,7 @@ app.post("/upload-files", upload.single("file"), async (req, res) => {
         fileUrl: file.path,
         receiver,
       },
+      qrcode: qrDataUrl
     });
 
   } catch (error) {

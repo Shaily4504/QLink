@@ -21,6 +21,7 @@
     "mongoose": "^8.13.2",
     "motion": "^12.7.3",
     "multer": "^1.4.5-lts.2",
+    "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-native-face-detection": "^0.1.1",
