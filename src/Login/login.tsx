@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { BackgroundBeamsWithCollision } from '../Components/Particles/collide';
 import '@coreui/coreui-pro/dist/css/coreui.min.css';
 import 'react-toastify/dist/ReactToastify.css';
 import Webcam from "react-webcam";
