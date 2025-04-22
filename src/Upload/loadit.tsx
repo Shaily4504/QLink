@@ -74,7 +74,7 @@ export const Loadit = () => {
         toast.error('File upload failed: Missing fileUrl');
         return;
       }
-      setQrDataUrl(fileUrl); // <-- ✅ Set QR code URL to show on screen
+      await generateQRCode(fileUrl); // <-- ✅ Set QR code URL to show on screen
       toast.success('Uploaded Successfully!', {
       });
     } catch (error) {
