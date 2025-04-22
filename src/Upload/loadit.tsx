@@ -3,9 +3,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import '@coreui/coreui-pro/dist/css/coreui.min.css';
 import 'react-toastify/dist/ReactToastify.css';
 // import { useNavigate } from 'react-router-dom';
+import QRCode from 'qrcode';
 import Select from 'react-select';
 import axios from 'axios';
-import {QRCodeSVG} from 'qrcode.react';
+// import {QRCodeSVG} from 'qrcode.react';
 
 type OptionType = {
   value: string;
@@ -18,13 +19,22 @@ export const Loadit = () => {
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
   const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
-  const [qrUrl, setQrUrl] = useState('');
+  const [qrDataUrl, setQrDataUrl] = useState('');
 
   const options: OptionType[] = [
     { value: 'yashpandey', label: 'Yash Bhushan Pandey' },
     { value: 'altamashbeg', label: 'Altamash Beg' },
     { value: 'priyanshkumarrai', label: 'Priyansh Kumar Rai' },
   ];
+
+  const generateQRCode = async (text: string) => {
+    try {
+      const qr = await QRCode.toDataURL(text);  // ✅ base64 URL
+      setQrDataUrl(qr);
+    } catch (err) {
+      console.error('Failed to generate QR:', err);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
@@ -64,7 +74,7 @@ export const Loadit = () => {
         toast.error('File upload failed: Missing fileUrl');
         return;
       }
-      setQrUrl(fileUrl); // <-- ✅ Set QR code URL to show on screen
+      setQrDataUrl(fileUrl); // <-- ✅ Set QR code URL to show on screen
       toast.success('Uploaded Successfully!', {
       });
     } catch (error) {
@@ -122,20 +132,7 @@ export const Loadit = () => {
         >
           Upload Now
         </button>
-        {qrUrl && (
-        <>
-          <p className='text-green-700 font-medium'>📄 PDF Uploaded Successfully</p>
-          <QRCodeSVG value={qrUrl} size={220} />
-          <a
-            href={qrUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className='text-blue-600 underline mt-2'
-          >
-            View PDF
-          </a>
-        </>
-      )}
+        {qrDataUrl && <img src={qrDataUrl} alt="Generated QR" style={{ width: '250px' }} />}
       </form>
     </div>
   );
