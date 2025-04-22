@@ -1,5 +1,5 @@
 import './App.css'
-import { Route, Routes, BrowserRouter } from 'react-router-dom'
+import {Route, Routes,HashRouter} from 'react-router-dom'
 import { Login } from './Login/login'
 import { Loadit } from './Upload/loadit'
 
@@ -8,12 +8,12 @@ const App = () => {
 
   return (
     <>
-    <BrowserRouter>
+    <HashRouter>
     <Routes>
         <Route path='/' element={<Login/>}/>
         <Route path='/Loadit' element={<Loadit/>}/>
     </Routes>
-    </BrowserRouter>
+    </HashRouter>
     </>
   )
 }
