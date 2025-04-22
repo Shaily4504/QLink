@@ -55,9 +55,10 @@ export const Loadit = () => {
       const response = await axios.post('https://qrsend-backend.onrender.com/upload-files', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      const uploadedFileName = response.data.fileName;
+      
+      const uploadedFileName = response.data.fileUrl;
       const backendBaseUrl = "https://qrsend-backend.onrender.com";
-      const fileUrl = `${backendBaseUrl}/files/${uploadedFileName}`;
+      const fileUrl = `${backendBaseUrl}/${uploadedFileName}`;
 
       if (!fileUrl) {
         toast.error('File upload failed: Missing fileUrl');
