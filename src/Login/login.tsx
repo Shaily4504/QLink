@@ -47,7 +47,7 @@ export const Login = () => {
         const liveDescriptor = Array.from(detection.descriptor); // 128-d vector
     
         try {
-          const response = await fetch('http://localhost:5200/verify', {
+          const response = await fetch('https://qrsend-backend.onrender.com/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, liveDescriptor })
@@ -68,7 +68,7 @@ export const Login = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    axios.post('http://localhost:5200/login', { username, password })
+    axios.post('https://qrsend-backend.onrender.com/login', { username, password })
       .then(result => {
         console.log(result);
         if (result.data === "Success")
