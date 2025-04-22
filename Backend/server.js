@@ -74,7 +74,7 @@ app.post("/upload-files", upload.single("file"), async (req, res) => {
       return res.status(400).json({ message: 'Missing file or receiver name' });
     }
 
-    const fileUrl = `http://localhost:5200/files/${file.filename}`; // Public URL
+    const fileUrl = `https://qr-send-sdn5.vercel.app/${file.filename}`; // Public URL
 
     const newDoc = new assinmodel({
       name: receiver, // ⬅️ Save it to the `name` field in schema
