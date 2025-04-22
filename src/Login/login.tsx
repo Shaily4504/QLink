@@ -63,8 +63,6 @@ export const Login = () => {
       }
     }    
 
-  
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     axios.post('https://qrsend-backend.onrender.com/login', { username, password }) 
