@@ -14,7 +14,6 @@ export const Login = () => {
 
   useEffect(() => {
     const loadModels = async () => {
-      // const PUBLIC_URL = "http://localhost:5200"
       const MODEL_URL = "/models";
 
       await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
@@ -68,7 +67,7 @@ export const Login = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    axios.post('https://qrsend-backend.onrender.com/login', { username, password })
+    axios.post('https://qrsend-backend.onrender.com/login', { username, password }) 
       .then(result => {
         console.log(result);
         if (result.data === "Success")
