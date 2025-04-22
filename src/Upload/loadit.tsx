@@ -55,17 +55,15 @@ export const Loadit = () => {
       const response = await axios.post('https://qrsend-backend.onrender.com/upload-files', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-
-      const fileUrl = response.data?.pdf?.fileUrl;
+      const uploadedFileName = response.data.fileName;
+      const backendBaseUrl = "https://qrsend-backend.onrender.com";
+      const fileUrl = `${backendBaseUrl}/files/${uploadedFileName}`;
 
       if (!fileUrl) {
         toast.error('File upload failed: Missing fileUrl');
         return;
       }
       setQrUrl(fileUrl); // <-- ✅ Set QR code URL to show on screen
-      toast.success('Uploaded Successfully!');
-
-  
       toast.success('Uploaded Successfully!', {
       });
     } catch (error) {
