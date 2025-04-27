@@ -2,6 +2,7 @@
 #include <ESP8266HTTPClient.h>
 #include <Wire.h>
 #include <Adafruit_SSD1306.h>
+#include <WiFiClientSecure.h>
 #include <MFRC522.h>
 #include <SPI.h>
 
@@ -21,7 +22,7 @@ const char* ssid = "moto";
 const char* password = "tere9876";
 
 // State
-WiFiClient client;
+WiFiClientSecure client;
 String lastUID = ""; // To prevent duplicate scans
 
 void setup() {
@@ -42,6 +43,7 @@ void setup() {
     delay(500);
     Serial.print(".");
   }
+  client.setInsecure();
 
   display.clearDisplay();
   display.setCursor(0, 0);
@@ -88,6 +90,8 @@ void loop() {
       display.setTextSize(1);
       display.setTextColor(WHITE);
       display.println("RFID Matched:");
+      display.clearDisplay();
+      display.println("Welcome");
       display.println(name);
       display.display();
     } else {

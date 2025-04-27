@@ -24,7 +24,7 @@ export const Loadit = () => {
   const options: OptionType[] = [
     { value: 'yashpandey', label: 'Yash Bhushan Pandey' },
     { value: 'altamashbeg', label: 'Altamash Beg' },
-    { value: 'priyanshkumarrai', label: 'Priyansh Kumar Rai' },
+    { value: 'Priyansh Neel', label: 'Priyansh Neel' },
   ];
 
   const generateQRCode = async (text: string) => {
