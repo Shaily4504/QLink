@@ -60,7 +60,7 @@ export const Loadit = () => {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('receiver', selectedOption.value); // ✅ This line sends the selected user
+      formData.append('receiver', selectedOption.value); 
       formData.append('label', selectedOption.label);
   
       const response = await axios.post('https://qrsend-backend.onrender.com/upload-files', formData, {
