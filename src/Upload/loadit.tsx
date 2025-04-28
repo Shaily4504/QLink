@@ -69,7 +69,7 @@ export const Loadit = () => {
 
       const uploadedFileName = response.data.fileName;
       const backendBaseUrl = "https://qrsend-backend.onrender.com";
-      const fileUrl = `${backendBaseUrl}/files/${uploadedFileName}`;
+      const fileUrl = response.data.fileUrl;
 
       if (!fileUrl) {
         toast.error('File upload failed: Missing fileUrl');
@@ -140,3 +140,6 @@ export const Loadit = () => {
 };
 
 export default Loadit;
+
+//ACCESS_KEY: AKIA3NVQI3DBTSS3RMNQ
+//SECRETE_ACCESS_KEY: 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

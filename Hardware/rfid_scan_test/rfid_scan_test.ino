@@ -5,15 +5,18 @@
 #include <WiFiClientSecure.h>
 #include <MFRC522.h>
 #include <SPI.h>
+#include <qrcode.h>  
 
 // OLED config
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define OLED_RESET -1
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+QRCode qrcode;
 
 // RFID pins
 constexpr uint8_t RST_PIN = D3;
+uint8_t qrcodeData[134];  // ✅ hardcoded size
 constexpr uint8_t SS_PIN = D4;
 MFRC522 rfid(SS_PIN, RST_PIN);
 
@@ -48,6 +51,7 @@ void setup() {
   display.clearDisplay();
   display.setCursor(0, 0);
   display.println("WiFi Connected!");
+  Serial.print("Wifi Connected");
   display.println("RFID Scanner Ready");
   display.display();
   delay(2000);
@@ -81,18 +85,23 @@ void loop() {
       String payload = http.getString();
       Serial.println(payload);
 
-      int nameStart = payload.indexOf("name\":\"") + 7;
+      int nameStart = payload.indexOf("label\":\"") + 8;
       int nameEnd = payload.indexOf("\"", nameStart);
       String name = payload.substring(nameStart, nameEnd);
+      int fileStart = payload.indexOf("pdfUrl\":\"") + 8;
+      int fileNameEnd = payload.indexOf("\"", nameStart);
+      String fileName = payload.substring(filestart, filenameEnd);
+
+      String fileurl = "https://yourserver.com/files/" + fileName;
 
       display.clearDisplay();
-      display.setCursor(0, 0);
+      display.setCursor(50, 0);
       display.setTextSize(1);
       display.setTextColor(WHITE);
-      display.println("RFID Matched:");
-      display.clearDisplay();
-      display.println("Welcome");
-      display.println(name);
+      //display.println("RFID Matched");
+      // display.println(name);
+      generateAndDisplayQR(fileurl.c_str()); // Send as const char*
+      Serial.println(name);
       display.display();
     } else {
       display.clearDisplay();
@@ -108,4 +117,26 @@ void loop() {
 
   rfid.PICC_HaltA();  // Stop reading
   delay(3000);        // 3 seconds before next read
+}
+
+void generateAndDisplayQR(const char* text) {
+  display.clearDisplay();
+  
+  // Initialize QR code
+  qrcode_initText(&qrcode, qrcodeData, 3, ECC_LOW, text); // version 3, error correction LOW
+
+  int scale = 2; // each QR pixel becomes 2x2 screen pixels
+  int offsetX = 10;  // Padding left
+  int offsetY = 10;  // Padding top
+
+  for (int y = 0; y < qrcode.size; y++) {
+    for (int x = 0; x < qrcode.size; x++) {
+      if (qrcode_getModule(&qrcode, x, y)) {
+        // Draw a filled rectangle for each "black" module
+        display.fillRect(offsetX + x * scale, offsetY + y * scale, scale, scale, WHITE);
+      }
+    }
+  }
+
+  display.display();
 }
