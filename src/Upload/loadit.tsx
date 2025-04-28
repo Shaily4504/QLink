@@ -140,6 +140,3 @@ export const Loadit = () => {
 };
 
 export default Loadit;
-
-//ACCESS_KEY: AKIA3NVQI3DBTSS3RMNQ
-//SECRETE_ACCESS_KEY: 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
