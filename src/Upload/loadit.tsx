@@ -69,7 +69,7 @@ export const Loadit = () => {
 
       // const uploadedFileName = response.data.fileName;
       // const backendBaseUrl = "https://qrsend-backend.onrender.com";
-      const fileUrl = response.data.fileUrl;
+      const fileUrl = response.data.viewerFileUrl;
 
       if (!fileUrl) {
         toast.error('File upload failed: Missing fileUrl');
@@ -83,7 +83,6 @@ export const Loadit = () => {
       toast.error('Submission failed, please try again');
     }
   };
-  
 
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-r from-[#3c50e0] to-[#00df9a] text-white px-6">
