@@ -67,8 +67,8 @@ export const Loadit = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      const uploadedFileName = response.data.fileName;
-      const backendBaseUrl = "https://qrsend-backend.onrender.com";
+      // const uploadedFileName = response.data.fileName;
+      // const backendBaseUrl = "https://qrsend-backend.onrender.com";
       const fileUrl = response.data.fileUrl;
 
       if (!fileUrl) {
