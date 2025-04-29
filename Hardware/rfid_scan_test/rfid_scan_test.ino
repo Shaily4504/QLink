@@ -6,6 +6,7 @@
 #include <MFRC522.h>
 #include <SPI.h>
 #include <qrcode.h>  
+#include "qrcode.h"
 
 // OLED config
 #define SCREEN_WIDTH 128
@@ -27,6 +28,27 @@ const char* password = "tere9876";
 // State
 WiFiClientSecure client;
 String lastUID = ""; // To prevent duplicate scans
+
+String urlEncode(const char *msg) {
+  const char *hex = "0123456789ABCDEF";
+  String encoded = "";
+
+  while (*msg != '\0') {
+    if (('a' <= *msg && *msg <= 'z') ||
+        ('A' <= *msg && *msg <= 'Z') ||
+        ('0' <= *msg && *msg <= '9') ||
+        *msg == '-' || *msg == '_' || *msg == '.' || *msg == '~') {
+      encoded += *msg;
+    } else {
+      encoded += '%';
+      encoded += hex[*msg >> 4];
+      encoded += hex[*msg & 15];
+    }
+    msg++;
+  }
+
+  return encoded;
+}
 
 void setup() {
   Serial.begin(115200);
@@ -51,7 +73,7 @@ void setup() {
   display.clearDisplay();
   display.setCursor(0, 0);
   display.println("WiFi Connected!");
-  Serial.print("Wifi Connected");
+  Serial.println("Wifi Connected");
   display.println("RFID Scanner Ready");
   display.display();
   delay(2000);
@@ -59,6 +81,7 @@ void setup() {
 }
 
 void loop() {
+  
   if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) {
     return;
   }
@@ -71,72 +94,100 @@ void loop() {
   Serial.print("Scanned UID: ");
   Serial.println(scannedRFID);
 
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    String url = "https://qrsend-backend.onrender.com/get-user-by-rfid/" + scannedRFID;
+ if(WiFi.status() == WL_CONNECTED) {
+  HTTPClient http;
 
-    http.begin(client, url);  // ✅ Corrected
+  String url = "https://qrsend-backend.onrender.com/get-user-by-rfid/" + scannedRFID;
 
-    int httpCode = http.GET();
-    Serial.print("HTTP Code: ");
-    Serial.println(httpCode);
+  http.begin(client, url);  // ✅ Corrected usage
 
-    if (httpCode == HTTP_CODE_OK) {
-      String payload = http.getString();
-      Serial.println(payload);
+  int httpCode = http.GET();
+  Serial.print("HTTP Code: ");
+  Serial.println(httpCode);
 
-      int nameStart = payload.indexOf("label\":\"") + 8;
-      int nameEnd = payload.indexOf("\"", nameStart);
-      String name = payload.substring(nameStart, nameEnd);
-      int fileStart = payload.indexOf("pdfUrl\":\"") + 8;
-      int fileNameEnd = payload.indexOf("\"", nameStart);
-      String fileName = payload.substring(filestart, filenameEnd);
+  if (httpCode == HTTP_CODE_OK) {
+    String payload = http.getString();
+    Serial.println(payload);
 
-      String fileurl = "https://yourserver.com/files/" + fileName;
+    // --- Parse 'label' ---
+    int labelStart = payload.indexOf("\"label\":\"") + 9;
+    int labelEnd = payload.indexOf("\"", labelStart);
+    String label = payload.substring(labelStart, labelEnd);
 
-      display.clearDisplay();
-      display.setCursor(50, 0);
-      display.setTextSize(1);
-      display.setTextColor(WHITE);
-      //display.println("RFID Matched");
-      // display.println(name);
-      generateAndDisplayQR(fileurl.c_str()); // Send as const char*
-      Serial.println(name);
-      display.display();
+    // --- Parse 'fileUrl' (inside 'pdf' object) ---
+    int urlStart = payload.indexOf("\"pdfUrl\":\"") + 10;
+    int urlEnd = payload.indexOf("\"", urlStart);
+    String fileUrl = payload.substring(urlStart, urlEnd);
+
+    Serial.println("Label: " + label);
+    Serial.println("File URL: " + fileUrl);
+
+    HTTPClient shortHttp;
+
+    String encodedUrl = urlEncode(fileUrl.c_str());
+    String shortApi = "https://tinyurl.com/api-create.php?url=" + fileUrl;
+
+    Serial.println("Shorten API: " + shortApi);  // Debug
+
+    http.begin(client, shortApi);
+
+    int shortCode = http.GET();
+    Serial.print("TinyURL HTTP Code: ");
+    Serial.println(shortCode);
+
+    String shortUrl;
+    if (shortCode == HTTP_CODE_OK) {
+      shortUrl = http.getString();
+      Serial.println("Shortened URL: " + shortUrl);
     } else {
-      display.clearDisplay();
-      display.setCursor(0, 0);
-      display.println("RFID Not Found");
-      display.display();
+      Serial.println("Failed to shorten URL!");
+      shortUrl = fileUrl;  // fallback: use original (even if long)
     }
+    shortHttp.end();
 
-    http.end();
+    display.clearDisplay();
+    display.setCursor(0, 0);
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.println(label);  // Show label or name
+
+    generateAndDisplayQR(shortUrl); // Generate QR from file URL
+    display.display();
+
   } else {
-    Serial.println("WiFi not connected");
+    display.clearDisplay();
+    display.setCursor(0, 0);
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.println("RFID Not Found");
+    display.display();
   }
+
+  http.end();
+} else {
+  Serial.println("WiFi not connected");
+}
 
   rfid.PICC_HaltA();  // Stop reading
   delay(3000);        // 3 seconds before next read
 }
 
-void generateAndDisplayQR(const char* text) {
+void generateAndDisplayQR(String url) {
+  QRCode qrcode;
+  uint8_t qrcodeData[qrcode_getBufferSize(3)];
+  qrcode_initText(&qrcode, qrcodeData, 3, ECC_MEDIUM, url.c_str());
+
+  int scale = 2;
+  int offsetX = (SCREEN_WIDTH - qrcode.size * scale) / 2;
+  int offsetY = (SCREEN_HEIGHT - qrcode.size * scale) / 2;
+
   display.clearDisplay();
-  
-  // Initialize QR code
-  qrcode_initText(&qrcode, qrcodeData, 3, ECC_LOW, text); // version 3, error correction LOW
-
-  int scale = 2; // each QR pixel becomes 2x2 screen pixels
-  int offsetX = 10;  // Padding left
-  int offsetY = 10;  // Padding top
-
-  for (int y = 0; y < qrcode.size; y++) {
-    for (int x = 0; x < qrcode.size; x++) {
+  for (uint8_t y = 0; y < qrcode.size; y++) {
+    for (uint8_t x = 0; x < qrcode.size; x++) {
       if (qrcode_getModule(&qrcode, x, y)) {
-        // Draw a filled rectangle for each "black" module
-        display.fillRect(offsetX + x * scale, offsetY + y * scale, scale, scale, WHITE);
+        display.fillRect(offsetX + x * scale, offsetY + y * scale, scale, scale, SSD1306_WHITE);
       }
     }
   }
-
   display.display();
 }
