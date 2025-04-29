@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import '@coreui/coreui-pro/dist/css/coreui.min.css';
 import 'react-toastify/dist/ReactToastify.css';
 import Webcam from "react-webcam";
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 import * as faceapi from "face-api.js";
 import axios from 'axios';
 
@@ -11,6 +13,7 @@ export const Login = () => {
   const webcamRef = useRef<Webcam>(null);
   const [initialized, setInitialized] = useState(false);
   const [result, setResult] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadModels = async () => {
@@ -54,6 +57,10 @@ export const Login = () => {
     
           const data = await response.json();
           setResult(data.message); // Show match result
+          toast.success("Identity Matched", {
+            onClose: () => navigate("/Loadit")
+          })
+          
         } catch (error) {
           console.error("Error verifying face:", error);
           setResult("❌ Error verifying face.");
@@ -68,13 +75,19 @@ export const Login = () => {
     axios.post('https://qrsend-backend.onrender.com/login', { username, password }) 
       .then(result => {
         console.log(result);
-        if (result.data === "Success")
-          console.log("✅ Login Success");
+        if (result.data === "Success"){
+          toast.success("Login Successful", {
+          })
+        }
+        else{
+          toast.error("Creditianls Not Match")
+        }
       }).catch(e => console.log(e));
   };
 
   return (
     <div className='flex h-screen items-center justify-center'>
+      <ToastContainer />
       <div className='relative flex flex-row-reverse rounded-2xl h-8/12 w-4xl shadow-neutral-950 shadow-2xl'>
         
         {/* Left Panel */}
