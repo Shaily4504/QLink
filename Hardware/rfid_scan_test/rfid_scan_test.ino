@@ -15,6 +15,10 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 QRCode qrcode;
 
+int scale = 2;
+int offsetX = (SCREEN_WIDTH - qrcode.size * scale) / 2;
+int offsetY = (SCREEN_HEIGHT - qrcode.size * scale) / 2;
+
 // RFID pins
 constexpr uint8_t RST_PIN = D3;
 uint8_t qrcodeData[134];  // ✅ hardcoded size
@@ -71,13 +75,21 @@ void setup() {
   client.setInsecure();
 
   display.clearDisplay();
-  display.setCursor(0, 0);
+  display.setCursor(17, 10);
   display.println("WiFi Connected!");
-  Serial.println("Wifi Connected");
-  display.println("RFID Scanner Ready");
   display.display();
   delay(2000);
+
   display.clearDisplay();
+  display.setCursor(17, 10);
+  display.println("Welcome back!");
+  display.display();
+  delay(2000);
+
+  display.clearDisplay();
+  display.setCursor(17, 10);
+  display.println("Scan your RFID");
+  display.display();
 }
 
 void loop() {

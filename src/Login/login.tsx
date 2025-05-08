@@ -7,6 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import * as faceapi from "face-api.js";
 import axios from 'axios';
 
+
 export const Login = () => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -18,7 +19,6 @@ export const Login = () => {
   useEffect(() => {
     const loadModels = async () => {
       const MODEL_URL = "/models";
-
       await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
       await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
       await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
@@ -89,8 +89,6 @@ export const Login = () => {
     <div className='flex h-screen items-center justify-center'>
       <ToastContainer />
       <div className='relative flex flex-row-reverse rounded-2xl h-8/12 w-4xl shadow-neutral-950 shadow-2xl'>
-        
-        {/* Left Panel */}
         <div className="relative w-4xl bg-black z-10 overflow-hidden rounded-r-2xl">
           <div className="absolute top-6 pr-3 left-6 z-10 flex flex-col items-start">
             <span className="text-white mb-1 font-greatvibe font-bold text-4xl">Hello, Priyansh!</span>
@@ -104,15 +102,12 @@ export const Login = () => {
             />
             <button 
               onClick={captureAndRecognize}
-              className='bg-[#00c78b] h-11 mt-2 font-medium text-white w-full'
-            >
+              className='bg-[#00c78b] h-11 mt-2 font-medium text-white w-full'>
               CHECK
             </button>
             <span className="text-white mt-2">{result}</span>
           </div>
         </div>
-
-        {/* Right Panel - Login Form */}
         <form onSubmit={handleSubmit} className='bg-white flex flex-col font-Manrope h-full w-7xl rounded-l-2xl text-center gap-3 px-10 justify-center'>
           <span className='text-5xl font-quicksand mb-10 font-semibold text-[#000000]'>Login Form</span>
           <input
