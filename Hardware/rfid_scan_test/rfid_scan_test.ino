@@ -26,8 +26,8 @@ constexpr uint8_t SS_PIN = D4;
 MFRC522 rfid(SS_PIN, RST_PIN);
 
 // WiFi credentials
-const char* ssid = "moto";
-const char* password = "tere9876";
+const char* ssid = "motoedge50";
+const char* password = "12335678";
 
 // State
 WiFiClientSecure client;
@@ -107,10 +107,11 @@ void loop() {
   Serial.println(scannedRFID);
 
  if(WiFi.status() == WL_CONNECTED) {
+  WiFiClientSecure client;
+  client.setInsecure(); // ✅ Skip certificate validation (only for testing!)
   HTTPClient http;
-
   String url = "https://qrsend-backend.onrender.com/get-user-by-rfid/" + scannedRFID;
-
+  
   http.begin(client, url);  // ✅ Corrected usage
 
   int httpCode = http.GET();
@@ -127,35 +128,12 @@ void loop() {
     String label = payload.substring(labelStart, labelEnd);
 
     // --- Parse 'fileUrl' (inside 'pdf' object) ---
-    int urlStart = payload.indexOf("\"pdfUrl\":\"") + 10;
+    int urlStart = payload.indexOf("\"smallpdfUrl\":\"") + 15;
     int urlEnd = payload.indexOf("\"", urlStart);
     String fileUrl = payload.substring(urlStart, urlEnd);
 
     Serial.println("Label: " + label);
     Serial.println("File URL: " + fileUrl);
-
-    HTTPClient shortHttp;
-
-    String encodedUrl = urlEncode(fileUrl.c_str());
-    String shortApi = "https://tinyurl.com/api-create.php?url=" + fileUrl;
-
-    Serial.println("Shorten API: " + shortApi);  // Debug
-
-    http.begin(client, shortApi);
-
-    int shortCode = http.GET();
-    Serial.print("TinyURL HTTP Code: ");
-    Serial.println(shortCode);
-
-    String shortUrl;
-    if (shortCode == HTTP_CODE_OK) {
-      shortUrl = http.getString();
-      Serial.println("Shortened URL: " + shortUrl);
-    } else {
-      Serial.println("Failed to shorten URL!");
-      shortUrl = fileUrl;  // fallback: use original (even if long)
-    }
-    shortHttp.end();
 
     display.clearDisplay();
     display.setCursor(0, 0);
@@ -163,7 +141,7 @@ void loop() {
     display.setTextColor(WHITE);
     display.println(label);  // Show label or name
 
-    generateAndDisplayQR(shortUrl); // Generate QR from file URL
+    generateAndDisplayQR(fileUrl); // Generate QR from file URL
     display.display();
 
   } else {

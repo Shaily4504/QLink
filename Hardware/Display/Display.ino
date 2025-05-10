@@ -21,7 +21,7 @@ void setup() {
   display.setTextColor(SSD1306_WHITE);
 
   // The text you want to encode in the QR code
-  String qrText = "https://shorturl.at/gJdzq"; // Change to your link
+  String qrText = "https://bit.ly/4m8hwAe"; // Change to your link
   generateAndDrawQR(qrText);
 }
 
