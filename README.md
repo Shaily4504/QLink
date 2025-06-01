@@ -3,6 +3,7 @@
 QLink is a smart RFID-based document access system that generates and displays secure QR codes for viewing documents uploaded via an admin backend. It's designed for seamless, tap-to-view access to important PDFs like ID cards, reports, certificates, etc.
 
 > ✅ Built for smart campuses, institutions, and workplaces looking to digitize document access.
+> ![alt text](https://github.com/Neel123priyansh/Academo/blob/main/img/Screenshot%202025-01-24%20000714.png/?raw=true)
 
 ---
 
