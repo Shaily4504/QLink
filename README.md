@@ -1,54 +1,41 @@
-# React + TypeScript + Vite
+# QLink 🔗
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+QLink is a smart RFID-based document access system that generates and displays secure QR codes for viewing documents uploaded via an admin backend. It's designed for seamless, tap-to-view access to important PDFs like ID cards, reports, certificates, etc.
 
-Currently, two official plugins are available:
+> ✅ Built for smart campuses, institutions, and workplaces looking to digitize document access.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🔧 Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- 📡 **RFID-based scanning**  
+  Detects RFID tags (like ID cards) to identify the user instantly.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- 📄 **Auto-fetch latest document**  
+  Connects with the QLink_Backend to fetch the most recent document for the scanned user.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- 🔐 **Secure access link**  
+  Generates a short and secure QR code link using Bitly.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- 🖥️ **OLED Display + QR Code**  
+  Shows the document name and a scannable QR code on a small OLED screen.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- ☁️ **Hosted on Render**  
+  Backend API hosted on [Render](https://render.com) for public access.
+
+---
+
+
+## 📦 Hardware Used
+
+- ESP8266 
+- MFRC522 RFID Module
+- SSD1306 OLED Display (I2C)
+- Jumper wires, breadboard
+
+---
+
+## 🌐 Backend Repo
+
+> Check out the backend powering QLink here:  
+🔗 [QLink_Backend](https://github.com/Neel123priyansh/QLink_backend)
