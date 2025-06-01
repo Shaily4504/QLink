@@ -26,8 +26,8 @@ constexpr uint8_t SS_PIN = D4;
 MFRC522 rfid(SS_PIN, RST_PIN);
 
 // WiFi credentials
-const char* ssid = "motoedge50";
-const char* password = "12335678";
+const char* ssid = "moto";
+const char* password = "tere9876";
 
 // State
 WiFiClientSecure client;
@@ -93,7 +93,6 @@ void setup() {
 }
 
 void loop() {
-  
   if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) {
     return;
   }
@@ -106,61 +105,72 @@ void loop() {
   Serial.print("Scanned UID: ");
   Serial.println(scannedRFID);
 
- if(WiFi.status() == WL_CONNECTED) {
-  WiFiClientSecure client;
-  client.setInsecure(); // ✅ Skip certificate validation (only for testing!)
-  HTTPClient http;
-  String url = "https://qrsend-backend.onrender.com/get-user-by-rfid/" + scannedRFID;
-  
-  http.begin(client, url);  // ✅ Corrected usage
+  if (WiFi.status() == WL_CONNECTED) {
+    WiFiClientSecure client;
+    client.setInsecure();  // ⚠️ Only for testing, don't use in production
 
-  int httpCode = http.GET();
-  Serial.print("HTTP Code: ");
-  Serial.println(httpCode);
+    HTTPClient http;
+    String url = "https://qrsend-backend.onrender.com/get-user-by-rfid/" + scannedRFID;
 
-  if (httpCode == HTTP_CODE_OK) {
-    String payload = http.getString();
-    Serial.println(payload);
+    http.begin(client, url);
+    http.setTimeout(10000);  // Set timeout BEFORE sending the request
 
-    // --- Parse 'label' ---
-    int labelStart = payload.indexOf("\"label\":\"") + 9;
-    int labelEnd = payload.indexOf("\"", labelStart);
-    String label = payload.substring(labelStart, labelEnd);
+    int httpCode;
+    int retries = 3;
 
-    // --- Parse 'fileUrl' (inside 'pdf' object) ---
-    int urlStart = payload.indexOf("\"smallpdfUrl\":\"") + 15;
-    int urlEnd = payload.indexOf("\"", urlStart);
-    String fileUrl = payload.substring(urlStart, urlEnd);
+    // Retry logic
+    do {
+      httpCode = http.GET();
+      Serial.print("HTTP Code: ");
+      Serial.println(httpCode);
+      if (httpCode != -11) break;
+      delay(500);
+    } while (--retries > 0);
 
-    Serial.println("Label: " + label);
-    Serial.println("File URL: " + fileUrl);
+    if (httpCode == HTTP_CODE_OK) {
+      String payload = http.getString();
+      Serial.println(payload);
 
-    display.clearDisplay();
-    display.setCursor(0, 0);
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.println(label);  // Show label or name
+      // --- Parse 'label' ---
+      int labelStart = payload.indexOf("\"label\":\"") + 9;
+      int labelEnd = payload.indexOf("\"", labelStart);
+      String label = payload.substring(labelStart, labelEnd);
 
-    generateAndDisplayQR(fileUrl); // Generate QR from file URL
-    display.display();
+      // --- Parse 'fileUrl' (inside 'pdf' object) ---
+      int urlStart = payload.indexOf("\"smallpdfUrl\":\"") + 16;  // fixed offset
+      int urlEnd = payload.indexOf("\"", urlStart);
+      String fileUrl = payload.substring(urlStart, urlEnd);
 
+      Serial.println("Label: " + label);
+      Serial.println("File URL: " + fileUrl);
+
+      display.clearDisplay();
+      display.setCursor(0, 0);
+      display.setTextSize(1);
+      display.setTextColor(WHITE);
+      display.println(label);
+
+      generateAndDisplayQR(fileUrl);
+      display.display();
+
+    } else {
+      display.clearDisplay();
+      display.setCursor(0, 0);
+      display.setTextSize(1);
+      display.setTextColor(WHITE);
+      display.println("RFID Not Found");
+      display.display();
+    }
+
+    http.end();
   } else {
-    display.clearDisplay();
-    display.setCursor(0, 0);
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.println("RFID Not Found");
-    display.display();
+    Serial.println("WiFi not connected");
   }
 
-  http.end();
-} else {
-  Serial.println("WiFi not connected");
+  rfid.PICC_HaltA();
+  delay(3000);
 }
 
-  rfid.PICC_HaltA();  // Stop reading
-  delay(3000);        // 3 seconds before next read
-}
 
 void generateAndDisplayQR(String url) {
   QRCode qrcode;
